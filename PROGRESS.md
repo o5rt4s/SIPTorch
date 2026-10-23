@@ -53,7 +53,7 @@ Les scripts de vérification et les messages de référence extraits ne sont pas
 - [ ] **Réponses envoyées comme si c'étaient des requêtes** (bcast, bigcode, noreason, respsclarg, unreason). Un UAS les jette sans répondre : le timeout est alors présenté comme un incident serveur, alors que c'est le résultat attendu.
 - [ ] **`checkBadResponse`** : `BAD_RESP = ['100','182','486','600']` traite des réponses finales (486, 600) comme provisoires, sans 180 ni 183, et n'attend qu'une seule réponse de plus.
 - [ ] **Pas de retransmission des requêtes en UDP** *(nouveau)* (Timers A/E de RFC 3261) : un seul datagramme perdu donne un timeout présenté comme un incident serveur.
-- [ ] **Validation de la cible** (`utils.lookUp`) : en TCP alors que l'outil parle UDP (faux négatif sur un serveur UDP seul). *Nouveau* : le port testé est figé à 5060 par la valeur par défaut de l'argument, évaluée à l'import ; l'option `-p` est donc ignorée, alors que le message d'erreur affiche le port demandé.
+- [x] **Validation de la cible** — corrigée. `utils.validateHost` résout l'IP puis envoie un SIP OPTIONS en UDP (`sipOptionsProbe`) et accepte toute réponse `SIP/2.0` (pas seulement 200 OK : un 405/404/403 prouve aussi la joignabilité). L'ancienne sonde TCP (`lookUp`) est supprimée, ce qui corrige le faux négatif sur serveur UDP seul et le bug `-p` (le port est lu à l'exécution, plus figé à 5060 à l'import).
 
 ### P2 — Robustesse
 

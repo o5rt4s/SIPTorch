@@ -50,47 +50,77 @@ def readHeader(temp: str):
 
 def validateHost(url: str):
     '''
-    Validating a host to be a proper host and not some random junk string
+    Resolve the target to an IPv4 address and check it actually speaks
+    SIP, by sending a SIP OPTIONS over UDP and waiting for a SIP reply.
+    Returns the IP on success, None otherwise.
     '''
     log = logging.getLogger('validateHost')
     log.info('Trying to validate host')
     try:
         socket.inet_aton(url)
+        ip = url
         log.info('Input seems to be a IP address')
-        if lookUp(url):
-            return url
-        else:
-            log.critical('Target %s not responding on port %s' % (url, config.RPORT))
-            return
     except OSError:
         log.info('The input does not seem to be a IP, must be a domain')
-        ip = lookUp(url, typef='domain')
-        if ip:
-            log.info("%s resolves to %s" % (url, ip))
-            return ip
-        else: return
-
-
-def lookUp(url: str, typef='ip', port=config.RPORT):
-    '''
-    Looks up domains and ip for validity
-    '''
-    log = logging.getLogger('lookUp')
-    # Checking for TCP support, might be useful for future support
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(2)
-        if typef == 'ip':
-            if s.connect_ex((url, port)) == 0:
-                log.info('Valid IP detected')
-                return True
-            else: return
-        else:
+        try:
             ip = socket.gethostbyname(url)
-            return ip
+            log.info("%s resolves to %s" % (url, ip))
+        except socket.error as err:
+            log.critical("Could not resolve %s: %s" % (url, err.__str__()))
+            return
+    if sipOptionsProbe(ip):
+        return ip
+    log.critical('Target %s:%s did not answer a SIP OPTIONS probe'
+                 % (ip, config.RPORT))
+    return
+
+
+def sipOptionsProbe(ip: str):
+    '''
+    Send a bare SIP OPTIONS over UDP to the target and return True if a
+    SIP response comes back. Any SIP/2.0 reply (not only 200 OK) proves
+    the target is reachable and speaks SIP - a 405/404/403 still answers.
+    '''
+    log = logging.getLogger('sipOptionsProbe')
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(config.TIMEOUT)
+    try:
+        # Connecting a UDP socket sends nothing but fixes the peer (so
+        # recv() only accepts the target's reply) and reveals the local
+        # source address for the Via. The source port stays ephemeral,
+        # so rport makes the server answer where we actually listen,
+        # and we avoid clashing with the tests binding on LPORT.
+        sock.connect((ip, config.RPORT))
+        src = sock.getsockname()[0]
+        branch = random.getrandbits(32)
+        callid = random.getrandbits(80)
+        tag = random.getrandbits(32)
+        req = (
+            'OPTIONS sip:%s SIP/2.0\r\n'
+            'Via: SIP/2.0/UDP %s:%s;branch=z9hG4bK-%s;rport\r\n'
+            'Max-Forwards: 70\r\n'
+            'From: "siptorch" <sip:siptorch@%s>;tag=%s\r\n'
+            'To: <sip:%s>\r\n'
+            'Call-ID: %s\r\n'
+            'CSeq: 1 OPTIONS\r\n'
+            'Content-Length: 0\r\n\r\n'
+        ) % (ip, src, config.LPORT, branch, ip, tag, ip, callid)
+        sock.send(req.encode('utf-8'))
+        data = sock.recv(8192)
+    except socket.timeout:
+        log.error('No SIP reply to OPTIONS within %ss' % config.TIMEOUT)
+        return False
     except socket.error as err:
-        log.critical("Socket errored out with: %s" % err.__str__())
-        return
+        log.critical("OPTIONS probe errored out: %s" % err.__str__())
+        return False
+    finally:
+        sock.close()
+    if data.startswith(b'SIP/2.0'):
+        line = data.split(b'\r\n', 1)[0].decode('utf-8', 'ignore')
+        log.info('Target speaks SIP: %s' % line)
+        return True
+    log.error('Reply is not a SIP response, discarding')
+    return False
 
 
 def getSourceHost():
