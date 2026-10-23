@@ -19,12 +19,14 @@ Dernière mise à jour : 2026-10-23.
 | `1c8cfb5` | **Contact** : adresse de l'outil au lieu de celle de la cible.<br>**Content-Type** : `application/sdp` quand l'INVITE porte du SDP ; en-tête retiré si le corps est vide.<br>**SDP** : `o=` et `c=` sur l'IP de l'outil.<br>**Via** : IP source réelle, plus `127.0.0.1` (`getSourceHost()`).<br>**Bind** : `0.0.0.0:LPORT` effectué avant l'envoi (`'any'` était invalide).<br>**Échappement** : `urlEncodeStrValid` réparé (cassait esc01). |
 | `36258b9` | Alignement des 10 tests non conformes sur leur référence RFC : cparam1, cparam2, escnull, lwsdp, novelscm, badbranch, reginvct, invsdp, insuf, mpmime.<br>`Content-Length` compté en octets UTF-8 et non plus en caractères. |
 | `fcb09e6` | `reginvct` construit son propre Contact. Corrige une régression introduite par `36258b9` : plantage quand le module est lancé seul. |
+| `54fc279` | Les 6 tests partiels ou non conformes restants alignés sur la RFC (lwsstart, multicl, bigcode, escinv, unksm2, noreason) ; Record-Route ajouté à inv2543. |
+| (ce commit) | **Point 2** : `DEF_HSET` copié à chaque requête, plus aucun état partagé entre tests. Les REGISTER reçoivent leur propre Contact (`<sip:<extension>@<IP source>:<LPORT>>`). |
 
 ### Vérification de non-régression (après `fcb09e6`)
 
 - Génération à graine aléatoire fixe, dans l'ordre réel de `runAll`, avant et après. Seuls les 10 modules visés changent ; les 38 autres messages sont identiques octet pour octet (hors en-tête `Date`).
 - Comparaison à l'annexe A : aucun écart ne se dégrade.
-- Chaque module lancé seul : plus de nouveau plantage. Les 6 plantages restants existaient avant les corrections (voir P2).
+- Chaque module lancé seul : aucun plantage, et message identique à celui produit dans l'exécution complète (preuve qu'aucun état ne fuit plus).
 - Les scripts de vérification et les messages de référence extraits ne sont **pas** dans le dépôt : ils étaient dans le répertoire temporaire de la session. Pour les reproduire, extraire l'archive base64 (tar.gz) de l'annexe A de la RFC, générer les messages en remplaçant `pluginbase` par un module vide, puis comparer ligne de départ et en-têtes ciblés.
 
 ## Reste à faire
@@ -39,7 +41,7 @@ Dernière mise à jour : 2026-10-23.
 
 ### P2 — Robustesse
 
-- [ ] **Dictionnaire d'en-têtes partagé** : `headers = DEF_HSET` sans copie dans `buildreq.makeRequest`, si bien que l'état fuit d'un test à l'autre. Les REGISTER récupèrent le Contact du test précédent. cparam1, cparam2, escinv, escnull, regeschd et reqsclarg plantent quand ils sont lancés seuls ; ils passent en exécution complète.
+- [x] **Dictionnaire d'en-têtes partagé** : corrigé, copie de `DEF_HSET` à chaque requête et Contact propre aux REGISTER. Seul effet sur les messages : la partie utilisateur du Contact de 6 REGISTER (cparam1, cparam2, dblreq, regeschd, reqsclarg, unkauth) devient l'extension au lieu d'un utilisateur hérité du test précédent.
 - [ ] `connector.sendreq` découpe une `str` avec un nombre d'octets : corruption au-delà de 8192 octets en UTF-8.
 - [ ] `utils.extractExtension` : `re.compile(motif, addr, re.I)` plante toujours, donc l'option `-F/--from-addr` est inutilisable.
 - [ ] `parser.parseSIPMessage` : `split('\r\n\r\n')` sans maxsplit, d'où une `ValueError` si le corps contient une ligne vide.

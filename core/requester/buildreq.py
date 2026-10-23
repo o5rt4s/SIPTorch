@@ -21,7 +21,8 @@ def makeRequest(method, bsbody=''):
     '''
     Build up the SIP request properly from scratch
     '''
-    headers = DEF_HSET
+    # Fresh copy: the default set must not carry state between requests
+    headers = dict(DEF_HSET)
     extension = DEF_EXT
     branch = BRANCH
     body = ''
@@ -67,13 +68,11 @@ def makeRequest(method, bsbody=''):
         headers["Call-ID"] = random.getrandbits(80)
     headers['CSeq'] = '%s %s' % (CSEQ, method)
     headers['Content-Length'] = len(body.encode('utf-8'))
-    if 'register' not in method.lower():
-        headers['Contact'] = '<sip:%s@%s:%s>' % (senderext, srchost, LPORT)
+    # A REGISTER binds the registered extension to our address
+    contactuser = extension if method.upper() == 'REGISTER' else senderext
+    headers['Contact'] = '<sip:%s@%s:%s>' % (contactuser, srchost, LPORT)
     if body and contenttype:
         headers['Content-Type'] = contenttype
-    else:
-        # headers is shared across requests, drop any stale value
-        headers.pop('Content-Type', None)
     r = '%s %s SIP/2.0\r\n' % (method, uri)
     reformedmsg = concatMethodxHeaders(r, headers, body=body)
     return reformedmsg
