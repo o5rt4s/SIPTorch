@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   'OPTIONS with Multiple Content-Length Values',
-    'id'        :   'multicl'
+    'id'        :   'multicl',
+    'rfc'       :   '3.3.9',
+    'ref'       :   'mcl01'
 }
 
 def multicl():

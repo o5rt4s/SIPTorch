@@ -20,7 +20,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Syntactical Parser Tests',
     'test'      :   'Long Values in Header Fields',
-    'id'        :   'longreq'
+    'id'        :   'longreq',
+    'rfc'       :   '3.1.1.7',
+    'ref'       :   'longreq'
 }
 
 def longreq():

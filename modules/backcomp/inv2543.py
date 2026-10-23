@@ -19,7 +19,9 @@ from mutators.replparam import rmallParam, rmspcParam
 module_info = {
     'category'  :   'Backward Compatability Tests',
     'test'      :   'INVITE With RFC 2543 Syntax Support',
-    'id'        :   'inv2543'
+    'id'        :   'inv2543',
+    'rfc'       :   '3.4.1',
+    'ref'       :   'inv2543'
 }
 
 def inv2543():

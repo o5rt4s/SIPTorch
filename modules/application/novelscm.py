@@ -18,7 +18,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   'Request-URI with Known but Atypical Scheme',
-    'id'        :   'novelscm'
+    'id'        :   'novelscm',
+    'rfc'       :   '3.3.3',
+    'ref'       :   'novelsc'
 }
 
 def novelscm():

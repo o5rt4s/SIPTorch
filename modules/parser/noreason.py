@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Syntactical Parser Tests',
     'test'      :   'Empty Reason Phrase',
-    'id'        :   'noreason'
+    'id'        :   'noreason',
+    'rfc'       :   '3.1.1.13',
+    'ref'       :   'noreason'
 }
 
 def noreason():

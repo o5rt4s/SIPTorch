@@ -19,7 +19,9 @@ from mutators.replparam import rmallParam, rmspcParam
 module_info = {
     'category'  :   'Invalid Messages',
     'test'      :   'Response with Overlarge Status Code',
-    'id'        :   'bigcode'
+    'id'        :   'bigcode',
+    'rfc'       :   '3.1.2.19',
+    'ref'       :   'bigcode'
 }
 
 def bigcode():

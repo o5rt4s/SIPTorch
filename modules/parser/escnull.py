@@ -18,7 +18,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Syntactical Parser Tests',
     'test'      :   'Escaped Nulls in URIs',
-    'id'        :   'escnull'
+    'id'        :   'escnull',
+    'rfc'       :   '3.1.1.4',
+    'ref'       :   'escnull'
 }
 
 def escnull():

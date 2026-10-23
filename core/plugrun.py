@@ -21,6 +21,15 @@ from core.colors import color, G, GR
 from core.requester import connector
 from core.utils import checkBadResponse
 
+def rfcref(minfo: dict):
+    '''
+    RFC 4475 section and reference message of a module, for the report
+    '''
+    if 'rfc' not in minfo:
+        return 'n/a'
+    return '§%s (message `%s`)' % (minfo['rfc'], minfo.get('ref', '?'))
+
+
 def runPlugin(msg: str, minfo: dict):
     '''
     Perform the request and print results
@@ -43,6 +52,7 @@ def runPlugin(msg: str, minfo: dict):
 ### Test: %s
 - Category: %s
 - ID: `%s`
+- RFC 4475: %s
 - Request:
 ```
 %s
@@ -50,7 +60,7 @@ def runPlugin(msg: str, minfo: dict):
 - Response:
 ```
 %s
-```''' % (minfo['test'], minfo['category'], minfo['id'], msg.strip(), data.strip())
+```''' % (minfo['test'], minfo['category'], minfo['id'], rfcref(minfo), msg.strip(), data.strip())
             logresp(logdata)
         # We wait for more data
         if checkBadResponse(data):

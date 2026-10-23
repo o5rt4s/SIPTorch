@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Invalid Messages',
     'test'      :   'Unterminated Quoted String in Display Names',
-    'id'        :   'balquote'
+    'id'        :   'balquote',
+    'rfc'       :   '3.1.2.6',
+    'ref'       :   'quotbal'
 }
 
 def balquote():

@@ -18,7 +18,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   'Multiple Values in Single Value Required Fields',
-    'id'        :   'multireq'
+    'id'        :   'multireq',
+    'rfc'       :   '3.3.8',
+    'ref'       :   'multi01'
 }
 
 def multireq():

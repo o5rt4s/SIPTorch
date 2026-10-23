@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Invalid Messages',
     'test'      :   'Spaces Within Address Specification',
-    'id'        :   'spacaddr'
+    'id'        :   'spacaddr',
+    'rfc'       :   '3.1.2.14',
+    'ref'       :   'badaspec'
 }
 
 def spacaddr():

@@ -18,7 +18,9 @@ from mutators.replparam import genRandStr
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   'Unknown/Invalid Authorization Scheme',
-    'id'        :   'unkauth'
+    'id'        :   'unkauth',
+    'rfc'       :   '3.3.7',
+    'ref'       :   'regaut01'
 }
 
 def unkauth():

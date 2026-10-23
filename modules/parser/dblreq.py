@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Syntactical Parser Tests',
     'test'      :   'Extra Trailing Octets in a UDP Datagram',
-    'id'        :   'dblreq'
+    'id'        :   'dblreq',
+    'rfc'       :   '3.1.1.8',
+    'ref'       :   'dblreq'
 }
 
 def dblreq():

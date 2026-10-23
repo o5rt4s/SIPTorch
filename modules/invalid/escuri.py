@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Invalid Messages',
     'test'      :   'Escaped Headers in SIP Request-URI',
-    'id'        :   'escuri'
+    'id'        :   'escuri',
+    'rfc'       :   '3.1.2.11',
+    'ref'       :   'escruri'
 }
 
 def escuri():

@@ -19,7 +19,9 @@ from mutators.replparam import rmallParam, rmspcParam
 module_info = {
     'category'  :   'Invalid Messages',
     'test'      :   'Non-token Characters in Display Name',
-    'id'        :   'invdisp'
+    'id'        :   'invdisp',
+    'rfc'       :   '3.1.2.15',
+    'ref'       :   'baddn'
 }
 
 def invdisp():

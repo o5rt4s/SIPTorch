@@ -17,7 +17,9 @@ from core.utils import getSourceHost
 module_info = {
     'category'  :   'Syntactical Parser Tests',
     'test'      :   'A Short Tortuous INVITE',
-    'id'        :   'wsinv'
+    'id'        :   'wsinv',
+    'rfc'       :   '3.1.1.1',
+    'ref'       :   'wsinv'
 }
 
 def wsinv():

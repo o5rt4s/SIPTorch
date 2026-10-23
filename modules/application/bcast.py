@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   '200 OK Response with Broadcast Via Header Field Value',
-    'id'        :   'bcast'
+    'id'        :   'bcast',
+    'rfc'       :   '3.3.10',
+    'ref'       :   'bcast'
 }
 
 def bcast():

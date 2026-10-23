@@ -18,7 +18,9 @@ from mutators.replparam import genRandStr
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   'Unknown/Invalid Content Type',
-    'id'        :   'invct'
+    'id'        :   'invct',
+    'rfc'       :   '3.3.6',
+    'ref'       :   'invut'
 }
 
 def invct():

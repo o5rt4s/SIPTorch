@@ -44,7 +44,7 @@ Méthode commune : messages générés hors réseau avec une graine aléatoire f
 ### P1 — Résultats faussés ou risque d'exploitation
 
 - [ ] **Appels fantômes.** Aucun CANCEL sur 1xx, ni ACK sur réponse finale, ni BYE sur 2xx. Le socket est fermé après la 1ʳᵉ ou la 2ᵉ réponse, ce qui laisse sonneries et transactions pendantes. Envoient un INVITE : insuf, invct, invsdp, multireq, inv2543, baddate, balquote, clerr, escuri, exthdsep, intwdcl, ltgtrequri, lwsstart, lwsuri, negcl, escvalid, longreq.
-- [ ] **Aucun verdict.** La première réponse reçue est loggée sans être comparée au comportement attendu par la RFC. À faire : ajouter `rfc`, `ref` et `expect` (par rôle : proxy, UAS, registrar) dans `module_info`, puis évaluer réussi/échoué.
+- [ ] **Aucun verdict.** La première réponse reçue est loggée sans être comparée au comportement attendu par la RFC. `rfc` et `ref` sont désormais dans `module_info` et dans le rapport ; reste à ajouter `expect` (par rôle : proxy, UAS, registrar) et à évaluer réussi/échoué.
 - [ ] **Réponses envoyées comme si c'étaient des requêtes** (bcast, bigcode, respsclarg, noreason, unreason). Un UAS les jette sans répondre, ce qui donne un timeout présenté comme un incident serveur. L'absence de réponse doit être le résultat attendu, et ces tests n'ont de sens que contre un proxy.
 - [ ] **`checkBadResponse`** : `BAD_RESP = ['100','182','486','600']` traite des réponses finales (486, 600) comme des provisoires, alors que 180 et 183 sont absents. Une seule réponse supplémentaire est attendue.
 - [ ] **Validation de la cible en TCP** (`utils.lookUp`) alors que l'outil parle UDP : faux négatif sur un serveur UDP seul.
@@ -78,6 +78,8 @@ Méthode commune : messages générés hors réseau avec une graine aléatoire f
 - [x] Libellés `module_info['test']` corrigés : noreason → « Empty Reason Phrase », trws → « SP Characters at End of Request-Line ».
 
 ## Correspondance modules ↔ RFC 4475
+
+Cette correspondance est aussi portée par chaque module (`module_info['rfc']` et `module_info['ref']`) et apparaît dans le rapport Markdown, sous la forme `- RFC 4475: §3.1.1.3 (message `esc01`)`.
 
 | § | Réf. | Module | | § | Réf. | Module |
 |---|---|---|---|---|---|---|

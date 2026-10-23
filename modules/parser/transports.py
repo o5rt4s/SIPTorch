@@ -19,7 +19,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Syntactical Parser Tests',
     'test'      :   'Varied and Unknown Transport Types',
-    'id'        :   'transports'
+    'id'        :   'transports',
+    'rfc'       :   '3.1.1.10',
+    'ref'       :   'transports'
 }
 
 def transports():

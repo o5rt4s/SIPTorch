@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   'INVITE Message Missing Required Header Fields',
-    'id'        :   'insuf'
+    'id'        :   'insuf',
+    'rfc'       :   '3.3.1',
+    'ref'       :   'insuf'
 }
 
 def insuf():

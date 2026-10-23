@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   'REGISTER with a URL Escaped Header',
-    'id'        :   'regeschd'
+    'id'        :   'regeschd',
+    'rfc'       :   '3.3.14',
+    'ref'       :   'regescrt'
 }
 
 def regeschd():

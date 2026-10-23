@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Syntactical Parser Tests',
     'test'      :   'Unusual Reason Phrase',
-    'id'        :   'unreason'
+    'id'        :   'unreason',
+    'rfc'       :   '3.1.1.12',
+    'ref'       :   'unreason'
 }
 
 def unreason():

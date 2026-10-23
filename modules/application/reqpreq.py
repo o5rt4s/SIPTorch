@@ -18,7 +18,9 @@ from mutators.replparam import genRandStr
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   'OPTIONS With Unknown Proxy-Require and Require Scheme',
-    'id'        :   'reqpreq'
+    'id'        :   'reqpreq',
+    'rfc'       :   '3.3.5',
+    'ref'       :   'bext01'
 }
 
 def reqpreq():

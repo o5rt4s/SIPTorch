@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Application Layer Semantics',
     'test'      :   'Unknown Request URI with Unknown Scheme in Header Fields',
-    'id'        :   'unkscm2'
+    'id'        :   'unkscm2',
+    'rfc'       :   '3.3.4',
+    'ref'       :   'unksm2'
 }
 
 def unkscm2():

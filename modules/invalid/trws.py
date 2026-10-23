@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Invalid Messages',
     'test'      :   'SP Characters at End of Request-Line',
-    'id'        :   'trws'
+    'id'        :   'trws',
+    'rfc'       :   '3.1.2.10',
+    'ref'       :   'trws'
 }
 
 def trws():

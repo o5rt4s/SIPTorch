@@ -17,7 +17,9 @@ from core.utils import getSourceHost
 module_info = {
     'category'  :   'Syntactical Parser Tests',
     'test'      :   'Wide Range of Valid Characters',
-    'id'        :   'intmeth'
+    'id'        :   'intmeth',
+    'rfc'       :   '3.1.1.2',
+    'ref'       :   'intmeth'
 }
 
 def intmeth():

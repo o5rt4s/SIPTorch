@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Invalid Messages',
     'test'      :   'Unknown Protocol Version',
-    'id'        :   'unkproto'
+    'id'        :   'unkproto',
+    'rfc'       :   '3.1.2.16',
+    'ref'       :   'badvers'
 }
 
 def unkproto():

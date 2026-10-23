@@ -18,7 +18,9 @@ from mutators.replparam import rmallParam, rmspcParam
 module_info = {
     'category'  :   'Transaction Layer Semantics',
     'test'      :   'Branch Tag Missing Transaction Identifier',
-    'id'        :   'badbranch'
+    'id'        :   'badbranch',
+    'rfc'       :   '3.2.1',
+    'ref'       :   'badbranch'
 }
 
 def badbranch():

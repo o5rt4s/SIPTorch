@@ -21,7 +21,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Syntactical Parser Tests',
     'test'      :   'Valid Use of the % Escaping Mechanism',
-    'id'        :   'escvalid'
+    'id'        :   'escvalid',
+    'rfc'       :   '3.1.1.3',
+    'ref'       :   'esc01'
 }
 
 def escvalid():

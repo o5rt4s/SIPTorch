@@ -17,7 +17,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Invalid Messages',
     'test'      :   'Invalid Time Zone in Date Header Field',
-    'id'        :   'baddate'
+    'id'        :   'baddate',
+    'rfc'       :   '3.1.2.12',
+    'ref'       :   'baddate'
 }
 
 def baddate():

@@ -18,7 +18,9 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 module_info = {
     'category'  :   'Invalid Messages',
     'test'      :   'Negative Content-Length',
-    'id'        :   'intwdcl'
+    'id'        :   'intwdcl',
+    'rfc'       :   '3.1.2.3',
+    'ref'       :   'ncl'
 }
 
 def intwdcl():
