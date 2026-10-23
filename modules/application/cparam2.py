@@ -34,10 +34,8 @@ def cparam2():
     log.info('Testing module: %s' % module_info['test'])
     msg = buildreq.makeRequest('REGISTER')
     mline, head, body = parseSIPMessage(msg)
-    # Tweak 1: Add an unknwown param to contact header
-    head['Contact'] += ';unknownparam'
-    # Tweak 2: Add the </> to make a complete URL
-    head['Contact'] = '<%s>' % head['Contact']
+    # Tweak 1: unknownparam a l'interieur des <>, donc url-param
+    head['Contact'] = '<%s;unknownparam>' % head.get('Contact').strip('<>')
     # Forming the request message back up
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

@@ -36,13 +36,8 @@ def urlEncodeStrValid(st: str):
     '''
     Add URL obfuscations to the string, legally where it is allowed
     '''
-    wdlist = list(st)
-    try:
-        for x in range(len(wdlist)):
-            wdlist[x] = SCHAR_MAP[wdlist[x]]
-    except KeyError:
-        pass
-    return ''.join(wdlist)
+    # Chars without a mapping are kept as is
+    return ''.join(SCHAR_MAP.get(c, c) for c in st)
 
 
 def urlEncodeChar(ch: str):

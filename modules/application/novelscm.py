@@ -39,7 +39,7 @@ def novelscm():
     log.info('Testing module: %s' % module_info['test'])
     msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
-    requri = 'beep.boop://%s:%s' % (config.IP, config.RPORT)
+    requri = 'soap.beep://%s:%s' % (config.IP, config.RPORT)
     # Tweak 1: Remove the following required headers
     mline = mline.replace(mline.split(' ')[1], requri)
     # Forming the request message back up

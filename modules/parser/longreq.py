@@ -13,6 +13,7 @@ import logging
 from libs import config
 from core.plugrun import runPlugin
 from core.requester import buildreq
+from core.utils import getSourceHost
 from mutators.multihead import multiHead
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 
@@ -48,7 +49,8 @@ def longreq():
     # Tweak 3: add call id
     head['Call-ID'] = 'longreq.one%slongcallidhere' % ('damnlong'*10)
     # Tweak 4: add contact
-    head['Contact'] = '<sip:%s@%s>' % (('toolongtohandle'*10), config.RHOST)
+    head['Contact'] = '<sip:%s@%s:%s>' % (('toolongtohandle'*10),
+        getSourceHost(), config.LPORT)
     # Tweak 5: add unknown value
     head['Unknown-L%sng-Field' % ('o'*75)] = '%s;%s=%s' % (
         'unknown-%s-value' % ('long'*20),

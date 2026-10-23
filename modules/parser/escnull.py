@@ -41,11 +41,11 @@ def escnull():
         'sip:null-%s-null@' % NULL_CHAR, head.get('To'))
     head['From'] = re.sub(r'sip:\w+?@', 
         'sip:null-%s-null@' % NULL_CHAR, head.get('From'))
-    # Tweak 2: Modify the contact header
-    head['Contact'] = re.sub(r'sip:\w+?@', 
-        'sip:%s@' % NULL_CHAR, head.get('Contact'))
-    head['CONTACT'] = re.sub(r'sip:\w+?@', 
-        'sip:%s@' % (NULL_CHAR*5), head.get('Contact'))
+    # Tweak 2: deux Contact distincts, %00 et %00%00, sur l'host reel
+    host = re.search(r'@([\w\.:]+)', head.get('Contact')).group(1)
+    head['Contact'] = '<sip:%s@%s>' % (NULL_CHAR, host)
+    # Clef differente pour ne pas ecraser le premier Contact dans le dict
+    head['CONTACT'] = '<sip:%s@%s>' % (NULL_CHAR*2, host)
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

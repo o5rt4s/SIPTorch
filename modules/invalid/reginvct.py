@@ -10,8 +10,10 @@
 # https://github.com/0xInfection/SIPTorch
 
 import logging
+from libs import config
 from core.plugrun import runPlugin
 from core.requester import buildreq
+from core.utils import getSourceHost
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 
 module_info = {
@@ -35,11 +37,13 @@ def reginvct():
     '''
     log = logging.getLogger('reginvct')
     log.info('Testing module: %s' % module_info['test'])
-    msg = buildreq.makeRequest('OPTIONS')
+    msg = buildreq.makeRequest('REGISTER')
     mline, head, body = parseSIPMessage(msg)
-    # Tweak 1: Modify the contact header, and leave it just 
-    # like that, not adding any < or > around URL
-    head['Contact'] += r'?Route=%3Csip:sip.example.com%3E'
+    # Tweak 1: header echappe dans l'URI sans <>, ce qui rend le
+    # Contact malforme (le name-addr serait obligatoire ici)
+    # Contact built here: makeRequest sets none on REGISTER
+    head['Contact'] = 'sip:%s@%s:%s%s' % (config.DEF_EXT, getSourceHost(),
+        config.LPORT, r'?Route=%3Csip:sip.example.com%3E')
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 

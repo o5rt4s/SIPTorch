@@ -36,6 +36,10 @@ def noreason():
     # Tweak 1: Modify the header of the message
     # We are using a \x20 char to form the remaining 
     mline = 'SIP/2.0 100%s' % bytearray.fromhex('20').decode('utf-8')
+    # Tweak 2: no body, as in the reference response
+    body = ''
+    head['Content-Length'] = 0
+    head.pop('Content-Type', None)
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

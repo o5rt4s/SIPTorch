@@ -93,6 +93,23 @@ def lookUp(url: str, typef='ip', port=config.RPORT):
         return
 
 
+def getSourceHost():
+    '''
+    Returns the local IPv4 address used to reach the target
+    (connecting a UDP socket sends no packet)
+    '''
+    if config.SRC_HOST:
+        return config.SRC_HOST
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect((config.IP, config.RPORT))
+        return s.getsockname()[0]
+    except socket.error:
+        return socket.gethostbyname(socket.gethostname())
+    finally:
+        s.close()
+
+
 def checkBadResponse(msg: str):
     '''
     Check the response received. If the response received is a bad response/waiting response

@@ -20,6 +20,9 @@ def sockinit():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.settimeout(config.TIMEOUT)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    # Bind before sending, otherwise the kernel picks an ephemeral port
+    # which does not match the port advertised in Via and Contact
+    sock.bind((config.BIND_IFACE, config.LPORT))
     return sock
 
 
@@ -42,16 +45,9 @@ def handler(sock):
     Listens for incoming messages
     '''
     log = logging.getLogger('handler')
-    bindingface = config.BIND_IFACE
-    localport = config.LPORT
     # Descriptors to use during async I/O waiting
     rlist = [sock]
     wlist, xlist = list(), list()
-    log.debug("Binding to %s:%s" % (bindingface, config.LPORT))
-    try:
-        sock.bind((bindingface, localport))
-    except socket.error as err:
-        pass
     while True:
         data, *_ = select.select(rlist, wlist, xlist, config.TIMEOUT)
         if data:

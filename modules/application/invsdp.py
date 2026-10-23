@@ -38,7 +38,7 @@ def invsdp():
     '''
     log = logging.getLogger('invsdp')
     log.info('Testing module: %s' % module_info['test'])
-    msg = buildreq.makeRequest('REGISTER')
+    msg = buildreq.makeRequest('INVITE')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Invalid Accept offering
     head['Accept'] = 'text/%s' % genRandStr(7)
