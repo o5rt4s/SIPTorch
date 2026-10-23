@@ -10,6 +10,8 @@
 # https://github.com/0xInfection/SIPTorch
 
 import logging, re
+from libs import config
+from core.utils import getSourceHost
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from mutators.urlencchar import urlEncodeStrInvalid
@@ -45,9 +47,15 @@ def escinv():
     head['From'] = re.sub(r'\"\w+?\"', '"%Z%45"', head.get('From'))
     # Tweak 3: Change the Cseq header
     head['CSeq'] = '%s %s' % (head.get('CSeq').split(' ')[0], newmeth)
-    # Tweak 4: Change a contact header
+    # Tweak 4: two genuine Contact values around an escaped header name
+    # which is an unknown header, not a third Contact
+    host = '%s:%s' % (getSourceHost(), config.LPORT)
     newct = '%s%s' % ('C', urlEncodeStrInvalid('ontact', value=1))
-    head[newct] = re.sub(r'sip:\w+?@', 'sip:6969@', head.get('Contact'))
+    head['Contact'] = '<sip:alias1@%s>' % host
+    head[newct] = '<sip:alias2@%s>' % host
+    head['CONTACT'] = '<sip:alias3@%s>' % host
+    # Tweak 5: a '%' which is not an escape in the Via branch token
+    head['Via'] = re.sub(r'branch=z9hG4bK-?(\w+)', r'branch=z9hG4bK\1%fz', head.get('Via'))
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

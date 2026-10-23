@@ -9,7 +9,7 @@
 # This module requires SIPTorch
 # https://github.com/0xInfection/SIPTorch
 
-import logging, random
+import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
@@ -33,8 +33,12 @@ def multicl():
     log.info('Testing module: %s' % module_info['test'])
     msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
-    # Tweak 1: Add multiple content-length values
-    head['content-length'] = random.getrandbits(6)
+    # Tweak 1: a text body framed by two conflicting Content-Length
+    # values, neither of which matches the actual body length
+    body = "There's no way to know how many octets are supposed to be here."
+    head['Content-Length'] = 13
+    head['content-length'] = 5
+    head['Content-Type'] = 'text/plain'
     # Recompiling our message
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

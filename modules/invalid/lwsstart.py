@@ -12,7 +12,6 @@
 import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
-from mutators.lwsinsert import lwsInsert
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 
 module_info = {
@@ -38,9 +37,9 @@ def lwsstart():
     log.info('Testing module: %s' % module_info['test'])
     msg = buildreq.makeRequest('INVITE')
     mline, head, body = parseSIPMessage(msg)
-    # Tweak 1: Double the spaces in the method line with tabs 
-    # or other space chars, maybe illegal but utf-8
-    mline = lwsInsert(mline, length=2, charc='', endsonly=True)
+    # Tweak 1: two SP between each Request-Line element. Only SP is
+    # tested here: TAB or other whitespace would be a different defect
+    mline = mline.replace(' ', '  ')
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 

@@ -10,6 +10,7 @@
 # https://github.com/0xInfection/SIPTorch
 
 import logging
+from libs import config
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
@@ -35,6 +36,9 @@ def inv2543():
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Remove branch parameter from Via
     head['Via'] = rmallParam(head['Via'])
+    # Tweak 1b: RFC 2543 Record-Route (present in the reference message)
+    head['Record-Route'] = '<sip:%s@%s;maddr=%s>' % (
+        config.DEF_EXT, config.RHOST, config.RHOST)
     # Tweak 2: Remove from tag
     head['From'] = rmspcParam(head['From'], 
         param='tag').replace('>', '') + ';user=phone>'

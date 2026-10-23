@@ -9,7 +9,7 @@
 # This module requires SIPTorch
 # https://github.com/0xInfection/SIPTorch
 
-import logging, random
+import logging
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
@@ -34,7 +34,8 @@ def bigcode():
     msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Modify the method line
-    mline = 'SIP/2.0 %s %s' % (random.getrandbits(32), genRandStr(20))
+    # 2**32 + 5 wraps to 5 when stored in a 32 bit integer
+    mline = 'SIP/2.0 %s %s' % (2**32 + 5, genRandStr(20))
     # Forming the request message back up
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

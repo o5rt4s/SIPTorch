@@ -13,7 +13,6 @@ import logging, random
 from core.requester import buildreq
 from core.plugrun import runPlugin
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
-from mutators.replparam import genRandStr
 
 module_info = {
     'category'  :   'Application Layer Semantics',
@@ -39,7 +38,7 @@ def unkscm2():
     msg = buildreq.makeRequest('REGISTER')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: modify the header URI scheme
-    head['To'] = '%s:%s' % (genRandStr(4), random.getrandbits(32))
+    head['To'] = 'isbn:%010d' % random.randrange(10**10)
     fromhead = head['From']
     head['From'] = fromhead.replace(fromhead.split(';')[0], '<http://example.com>')
     head['Contact'] = '<name:siptorch_flames>'
