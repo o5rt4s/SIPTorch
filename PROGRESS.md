@@ -12,8 +12,8 @@ Dernière mise à jour : 2026-10-23.
 
 ## État actuel
 
-- 48 modules, tous comparés aux messages de référence de la RFC 4475 (annexe A).
-- Sur le défaut testé : **48 conformes, 0 partiel, 0 non conforme**. 2 cas de la RFC (wsinv, intmeth) n'ont toujours pas de module.
+- 50 modules (wsinv et intmeth ajoutés), tous comparés aux messages de référence de la RFC 4475 (annexe A).
+- Sur le défaut testé : **50 conformes, 0 partiel, 0 non conforme**. Les 49 cas de la RFC 4475 §3 sont tous couverts (wsinv et intmeth inclus ; le 50ᵉ module, intwdcl, est la variante « Content-Length non numérique » de ncl).
 - **Aucune vérification contre un vrai serveur SIP.** Tout a été validé hors réseau : génération des messages et comparaison à la référence.
 - **L'outil n'est pas utilisable sur une plateforme de production** : il laisse des appels fantômes (voir P1).
 
@@ -28,6 +28,7 @@ Dernière mise à jour : 2026-10-23.
 | `da23827` | **Point 2** : `DEF_HSET` copié à chaque requête, plus aucun état partagé entre tests. Les REGISTER reçoivent leur propre Contact (`<sip:<extension>@<IP source>:<LPORT>>`). |
 
 | `6208ee5` | Merge de la branche de travail dans `develop`. |
+| (ce commit) | Ajout de wsinv (§3.1.1.1) et intmeth (§3.1.1.2), émis littéralement (pliage, LWS, ordre, octets non-ASCII) ; intmeth bit-exact à l'hôte près. Libellés `module_info['test']` de noreason et trws corrigés. `modules.json` régénéré (50 tests). |
 
 ### Vérifications effectuées
 
@@ -73,17 +74,15 @@ Méthode commune : messages générés hors réseau avec une graine aléatoire f
   - inv2543 : ajout du `Record-Route` présent dans le message de référence.
 - [ ] Reste des valeurs tirées au hasard, de même nature que la RFC (non bloquant) : méthode et header échappés de escinv, méthode inconnue de metmatch, noms d'en-tête longs de longreq. intwdcl utilise la variante « Content-Length non numérique » explicitement citée par la RFC §3.1.2.3.
 - [ ] mpmime : la partie binaire n'est pas bit-exacte (265 octets contre 342 dans la référence). Le module décode le blob en UTF-8 avec `errors='ignore'`, ce qui supprime des octets. Le défaut testé reste présent (octets 0x00 dans la partie binaire, Content-Length exact). Pour le corriger, il faut faire transiter le message en octets bruts dans `buildreq`, `concatMethodxHeaders` et `connector`.
-- [ ] Tests absents : wsinv (§3.1.1.1), dont la config `EXT_HEADERS` est prévue mais inutilisée, et intmeth (§3.1.1.2).
-- [ ] Libellés `module_info['test']` erronés :
-  - `noreason` est intitulé « Content Length Larger Than Message » au lieu de « Empty Reason Phrase » ;
-  - `trws` est intitulé « Escaped Headers in SIP Request-URI » au lieu de « SP Characters at End of Request-Line ».
+- [x] Tests absents ajoutés : wsinv (§3.1.1.1) et intmeth (§3.1.1.2). Émis littéralement car le pliage de lignes, la LWS entre `:`, l'ordre et les octets non-ASCII ne peuvent pas être reconstruits via le dict de `concatMethodxHeaders`. intmeth est bit-exact à la référence (hôte substitué) ; wsinv l'est à l'hôte et au CRLF final près. La config `EXT_HEADERS`/`IDENTITY` reste inutilisée (le contenu de wsinv est embarqué dans le module).
+- [x] Libellés `module_info['test']` corrigés : noreason → « Empty Reason Phrase », trws → « SP Characters at End of Request-Line ».
 
 ## Correspondance modules ↔ RFC 4475
 
 | § | Réf. | Module | | § | Réf. | Module |
 |---|---|---|---|---|---|---|
-| 3.1.1.1 | wsinv | — | | 3.1.2.11 | escruri | escuri |
-| 3.1.1.2 | intmeth | — | | 3.1.2.12 | baddate | baddate |
+| 3.1.1.1 | wsinv | wsinv | | 3.1.2.11 | escruri | escuri |
+| 3.1.1.2 | intmeth | intmeth | | 3.1.2.12 | baddate | baddate |
 | 3.1.1.3 | esc01 | escvalid | | 3.1.2.13 | regbadct | reginvct |
 | 3.1.1.4 | escnull | escnull | | 3.1.2.14 | badaspec | spacaddr |
 | 3.1.1.5 | esc02 | escinv | | 3.1.2.15 | baddn | invdisp |

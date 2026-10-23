@@ -16,7 +16,7 @@ from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 
 module_info = {
     'category'  :   'Invalid Messages',
-    'test'      :   'Escaped Headers in SIP Request-URI',
+    'test'      :   'SP Characters at End of Request-Line',
     'id'        :   'trws'
 }
 

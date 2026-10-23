@@ -38,7 +38,7 @@
         "Request Scalar Fields with Overlarge Values",
         "Response Scalar Fields with Overlarge Values",
         "Spaces Within Address Specification",
-        "Escaped Headers in SIP Request-URI",
+        "SP Characters at End of Request-Line",
         "Unknown Protocol Version"
     ],
     "Syntactical Parser Tests": [
@@ -46,13 +46,15 @@
         "Use of \"%\" When It Is Not an Escape",
         "Escaped Nulls in URIs",
         "Valid Use of the % Escaping Mechanism",
+        "Wide Range of Valid Characters",
         "Long Values in Header Fields",
         "Message with No LWS between Display Name and <",
         "Multipart MIME Message",
-        "Content Length Larger Than Message",
+        "Empty Reason Phrase",
         "Semicolon-Separated Parameters in URI User Part",
         "Varied and Unknown Transport Types",
-        "Unusual Reason Phrase"
+        "Unusual Reason Phrase",
+        "A Short Tortuous INVITE"
     ],
     "Transaction Layer Semantics": [
         "Branch Tag Missing Transaction Identifier"
