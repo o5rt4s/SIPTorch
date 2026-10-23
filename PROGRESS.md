@@ -8,7 +8,6 @@ Dernière mise à jour : 2026-10-23 (audit complet refait sur `c55cc1f`).
 
 - `master` : code d'origine (`cb956ba`), inchangé.
 - `develop` : branche d'intégration, contient toutes les corrections.
-- `claude/amazing-fermat-qsvn2o` : ancienne branche de travail, entièrement contenue dans `develop`. **À supprimer à la main sur GitHub** : la suppression est refusée (403) par la politique réseau de la session Claude.
 
 ## État actuel
 
