@@ -19,7 +19,7 @@ from libs import config
 from core.logger import logresp
 from core.colors import color, G, GR
 from core.requester import connector
-from core.utils import checkBadResponse
+from core.utils import checkBadResponse, getSourceHost
 
 def rfcref(minfo: dict):
     '''
@@ -43,6 +43,12 @@ def runPlugin(msg: str, minfo: dict):
     sock = None
     try:
         sock = connector.sockinit()
+        if not config.FIXED_LPORT:
+            # Advertise the ephemeral port actually used (Via sent-by and
+            # Contact) so replies come back with or without rport
+            src = getSourceHost()
+            msg = msg.replace('%s:%s' % (src, config.LPORT),
+                              '%s:%s' % (src, sock.getsockname()[1]))
         log.debug('\n%sRequest:%s %s' % (color.RED, color.END, msg.strip()))
         connector.sendreq(sock, msg)
         data, *_ = connector.handler(sock)

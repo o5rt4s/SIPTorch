@@ -24,6 +24,11 @@ RPORT = 5060
 # Local port to use
 LPORT = 5060
 
+# By default each test uses its own ephemeral source port, so late
+# retransmissions of a previous test's response cannot be mistaken for
+# the current one. Set (with -P/--lport) to bind every test on LPORT.
+FIXED_LPORT = False
+
 ############################
 # Parts of the SIP message #
 ############################

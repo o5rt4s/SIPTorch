@@ -24,15 +24,16 @@ def sockinit():
     # No SO_REUSEADDR: UDP has no TIME_WAIT so rebinding after close()
     # already works, and with it the bind could succeed on a port held by
     # a local SIP stack that also set it, silently diverting its traffic.
-    # Bind before sending, otherwise the kernel picks an ephemeral port
-    # which does not match the port advertised in Via and Contact
+    # Ephemeral port per test by default (port 0); a fixed one with -P.
+    # runPlugin then writes the real port into Via and Contact.
+    port = config.LPORT if config.FIXED_LPORT else 0
     try:
-        sock.bind((config.BIND_IFACE, config.LPORT))
+        sock.bind((config.BIND_IFACE, port))
     except OSError as err:
         sock.close()
         log.critical('Cannot bind local port %s: %s. Another process may '
                      'be using it; pick a free one with -P/--lport.'
-                     % (config.LPORT, err.__str__()))
+                     % (port, err.__str__()))
         raise
     return sock
 

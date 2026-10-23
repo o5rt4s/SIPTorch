@@ -39,7 +39,7 @@ required.add_argument('-u', '--target', help='Destination target to test', dest=
 optional.add_argument('-p', '--rport',
                 help='Destination port to use for sending packets to (default: 5060)', dest='rport', type=int)
 optional.add_argument('-P', '--lport',
-                help='Local source port to use for binding to (default: 5060)', dest='lport', type=int)
+                help='Fixed local source port for every test (default: a new ephemeral port per test)', dest='lport', type=int)
 optional.add_argument('-o', '--output',
                 help='Output directory to write results to (default: ./siptorch-output/)', dest='output', type=str)
 optional.add_argument('-d', '--delay',
@@ -100,6 +100,7 @@ if args.toaddr:
 
 if args.lport:
     config.LPORT = args.lport
+    config.FIXED_LPORT = True
 
 if args.rport:
     config.RPORT = args.rport
