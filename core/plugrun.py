@@ -40,6 +40,7 @@ def runPlugin(msg: str, minfo: dict):
         return
     print(GR, 'Running test: %s%s%s' % (color.ORANGE, minfo['test'], color.END))
     log.debug("Sending the request")
+    sock = None
     try:
         sock = connector.sockinit()
         log.debug('\n%sRequest:%s %s' % (color.RED, color.END, msg.strip()))
@@ -74,11 +75,15 @@ def runPlugin(msg: str, minfo: dict):
 ```
                 ''' % data.strip()
                 logresp(logdata)
-        sock.close()  # Terminate the socket
         return True
     except socket.error as err:
         log.critical('Something\'s not right here: %s' % err.__str__())
-        return 
+        return
+    finally:
+        # Always release the local port, even on error, so the next
+        # test can rebind it instead of failing with EADDRINUSE
+        if sock is not None:
+            sock.close()
 
 
 def buildcache(pluginlist):

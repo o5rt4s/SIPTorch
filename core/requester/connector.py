@@ -17,12 +17,22 @@ def sockinit():
     '''
     Initiates a socket connection
     '''
+    log = logging.getLogger('sockinit')
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.settimeout(config.TIMEOUT)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    # Allow rebinding the fixed local port between successive tests
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     # Bind before sending, otherwise the kernel picks an ephemeral port
     # which does not match the port advertised in Via and Contact
-    sock.bind((config.BIND_IFACE, config.LPORT))
+    try:
+        sock.bind((config.BIND_IFACE, config.LPORT))
+    except OSError as err:
+        sock.close()
+        log.critical('Cannot bind local port %s: %s. Another process may '
+                     'be using it; pick a free one with -P/--lport.'
+                     % (config.LPORT, err.__str__()))
+        raise
     return sock
 
 

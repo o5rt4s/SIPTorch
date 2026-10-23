@@ -59,6 +59,7 @@ Les scripts de vérification et les messages de référence extraits ne sont pas
 
 - [x] Dictionnaire d'en-têtes partagé — corrigé (`da23827`).
 - [x] Partie utilisateur non-`\w` — corrigé. escvalid plantait (`.group(1)` sur `None`) et escnull/escinv rataient leur substitution en silence dès que l'extension contenait un caractère hors `\w` (ex. une extension E.164 `+33612345678` via `-e`). Les regex ciblent désormais la userpart réelle (`sip:[^@\s]+@`) et le display name quoté (`"[^"]*"`).
+- [x] `EADDRINUSE` (Errno 98) en cascade — corrigé. `runPlugin` ne fermait pas le socket si `sendreq`/`handler` levait une erreur : le port local restait lié et tous les tests suivants échouaient au `bind`. Fermeture garantie par `finally` ; `SO_REUSEADDR` ajouté avant le `bind` ; message explicite renvoyant vers `-P/--lport` quand un autre process occupe déjà le port (le bind échoue toujours dans ce cas — `SO_REUSEADDR` n'est pas `SO_REUSEPORT`).
 - [ ] `connector.sendreq` découpe une `str` avec un nombre d'octets : corruption au-delà de 8192 octets en UTF-8.
 - [ ] `utils.extractExtension` : `re.compile(motif, addr, re.I)` plante toujours, donc l'option `-F/--from-addr` est inutilisable.
 - [ ] `parser.parseSIPMessage` : `split('\r\n\r\n')` sans maxsplit, d'où une `ValueError` si le corps contient une ligne vide.
