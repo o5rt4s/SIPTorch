@@ -1,7 +1,12 @@
 # PROGRESS — Audit et corrections SIPTorch
 
 Suivi de l'audit de SIPTorch (suite de tests de torture SIP, RFC 4475) et des corrections apportées.
-Branche de travail : `claude/amazing-fermat-qsvn2o`.
+Branche d'intégration : `develop`. `master` n'a pas été modifiée.
+
+Branches :
+- `master` : code d'origine (`cb956ba`), inchangé.
+- `develop` : `master` + l'ensemble des corrections, fusionnées par le commit de merge `6208ee5`.
+- `claude/amazing-fermat-qsvn2o` : ancienne branche de travail, entièrement contenue dans `develop`. **À supprimer à la main sur GitHub** : la suppression est refusée (403) par la politique réseau de la session Claude.
 
 Dernière mise à jour : 2026-10-23.
 
@@ -20,13 +25,17 @@ Dernière mise à jour : 2026-10-23.
 | `36258b9` | Alignement des 10 tests non conformes sur leur référence RFC : cparam1, cparam2, escnull, lwsdp, novelscm, badbranch, reginvct, invsdp, insuf, mpmime.<br>`Content-Length` compté en octets UTF-8 et non plus en caractères. |
 | `fcb09e6` | `reginvct` construit son propre Contact. Corrige une régression introduite par `36258b9` : plantage quand le module est lancé seul. |
 | `54fc279` | Les 6 tests partiels ou non conformes restants alignés sur la RFC (lwsstart, multicl, bigcode, escinv, unksm2, noreason) ; Record-Route ajouté à inv2543. |
-| (ce commit) | **Point 2** : `DEF_HSET` copié à chaque requête, plus aucun état partagé entre tests. Les REGISTER reçoivent leur propre Contact (`<sip:<extension>@<IP source>:<LPORT>>`). |
+| `da23827` | **Point 2** : `DEF_HSET` copié à chaque requête, plus aucun état partagé entre tests. Les REGISTER reçoivent leur propre Contact (`<sip:<extension>@<IP source>:<LPORT>>`). |
 
-### Vérification de non-régression (après `fcb09e6`)
+| `6208ee5` | Merge de la branche de travail dans `develop`. |
 
-- Génération à graine aléatoire fixe, dans l'ordre réel de `runAll`, avant et après. Seuls les 10 modules visés changent ; les 38 autres messages sont identiques octet pour octet (hors en-tête `Date`).
-- Comparaison à l'annexe A : aucun écart ne se dégrade.
-- Chaque module lancé seul : aucun plantage, et message identique à celui produit dans l'exécution complète (preuve qu'aucun état ne fuit plus).
+### Vérifications effectuées
+
+Méthode commune : messages générés hors réseau avec une graine aléatoire fixe, dans l'ordre réel de `runAll`, puis comparés avant/après chaque commit et aux messages de référence de l'annexe A.
+
+- `36258b9` et `fcb09e6` : seuls les 10 modules visés changent, les 38 autres sont identiques octet pour octet (hors en-tête `Date`). La régression de `reginvct` (plantage en exécution isolée) a été détectée puis corrigée par `fcb09e6`.
+- `54fc279` : seuls les 7 modules visés changent. Le défaut RFC de chacun est vérifié par assertion explicite sur 200 graines différentes : 200/200 pour les 7.
+- `da23827` : seule la partie utilisateur du Contact de 6 REGISTER change. Comparaison à l'annexe A identique ligne pour ligne. Les 48 modules lancés seuls ne plantent plus et produisent le même message qu'en exécution complète, ce qui prouve qu'aucun état ne fuit plus.
 - Les scripts de vérification et les messages de référence extraits ne sont **pas** dans le dépôt : ils étaient dans le répertoire temporaire de la session. Pour les reproduire, extraire l'archive base64 (tar.gz) de l'annexe A de la RFC, générer les messages en remplaçant `pluginbase` par un module vide, puis comparer ligne de départ et en-têtes ciblés.
 
 ## Reste à faire
@@ -63,6 +72,7 @@ Dernière mise à jour : 2026-10-23.
   - noreason : réponse 100 sans corps.
   - inv2543 : ajout du `Record-Route` présent dans le message de référence.
 - [ ] Reste des valeurs tirées au hasard, de même nature que la RFC (non bloquant) : méthode et header échappés de escinv, méthode inconnue de metmatch, noms d'en-tête longs de longreq. intwdcl utilise la variante « Content-Length non numérique » explicitement citée par la RFC §3.1.2.3.
+- [ ] mpmime : la partie binaire n'est pas bit-exacte (265 octets contre 342 dans la référence). Le module décode le blob en UTF-8 avec `errors='ignore'`, ce qui supprime des octets. Le défaut testé reste présent (octets 0x00 dans la partie binaire, Content-Length exact). Pour le corriger, il faut faire transiter le message en octets bruts dans `buildreq`, `concatMethodxHeaders` et `connector`.
 - [ ] Tests absents : wsinv (§3.1.1.1), dont la config `EXT_HEADERS` est prévue mais inutilisée, et intmeth (§3.1.1.2).
 - [ ] Libellés `module_info['test']` erronés :
   - `noreason` est intitulé « Content Length Larger Than Message » au lieu de « Empty Reason Phrase » ;
