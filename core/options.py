@@ -47,7 +47,7 @@ optional.add_argument('-d', '--delay',
 optional.add_argument('-t', '--timeout',
                 help='Timeout value in seconds (default: 5)', dest='timeout', type=int)
 optional.add_argument('-e', '--extension',
-                help='Extension to use during tests (default: 2000)', dest='exten', type=int)
+                help='Extension to use during tests (default: 2000)', dest='exten', type=str)
 optional.add_argument('-F', '--from-addr',
                 help='The from address of the SIP message, should strictly be of format - `"name" <sip:ext@(site.tld|ip)>`', dest='fromaddr')
 optional.add_argument('-T', '--to-addr',
