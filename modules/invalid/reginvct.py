@@ -10,8 +10,10 @@
 # https://github.com/0xInfection/SIPTorch
 
 import logging
+from libs import config
 from core.plugrun import runPlugin
 from core.requester import buildreq
+from core.utils import getSourceHost
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 
 module_info = {
@@ -39,8 +41,9 @@ def reginvct():
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: header echappe dans l'URI sans <>, ce qui rend le
     # Contact malforme (le name-addr serait obligatoire ici)
-    head['Contact'] = head.get('Contact').strip('<>') + \
-        r'?Route=%3Csip:sip.example.com%3E'
+    # Contact built here: makeRequest sets none on REGISTER
+    head['Contact'] = 'sip:%s@%s:%s%s' % (config.DEF_EXT, getSourceHost(),
+        config.LPORT, r'?Route=%3Csip:sip.example.com%3E')
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 
