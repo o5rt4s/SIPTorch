@@ -84,7 +84,7 @@ Les scripts de vérification et les messages de référence extraits ne sont pas
 
 ## Correspondance modules ↔ RFC 4475
 
-Portée aussi par chaque module (`module_info['rfc']`, `module_info['ref']`) et affichée dans le rapport, sous la forme `- RFC 4475: §3.1.1.3 (message `esc01`)`.
+Portée aussi par chaque module (`module_info['rfc']`, `module_info['ref']`) et affichée dans le rapport, sous la forme `- RFC 4475: section 3.1.1.3 (message `esc01`)`.
 
 | § | Réf. | Module | | § | Réf. | Module |
 |---|---|---|---|---|---|---|

@@ -27,7 +27,7 @@ def rfcref(minfo: dict):
     '''
     if 'rfc' not in minfo:
         return 'n/a'
-    return '§%s (message `%s`)' % (minfo['rfc'], minfo.get('ref', '?'))
+    return 'section %s (message `%s`)' % (minfo['rfc'], minfo.get('ref', '?'))
 
 
 def runPlugin(msg: str, minfo: dict):
