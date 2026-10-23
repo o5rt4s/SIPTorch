@@ -21,8 +21,9 @@ def sockinit():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.settimeout(config.TIMEOUT)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    # Allow rebinding the fixed local port between successive tests
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # No SO_REUSEADDR: UDP has no TIME_WAIT so rebinding after close()
+    # already works, and with it the bind could succeed on a port held by
+    # a local SIP stack that also set it, silently diverting its traffic.
     # Bind before sending, otherwise the kernel picks an ephemeral port
     # which does not match the port advertised in Via and Contact
     try:
