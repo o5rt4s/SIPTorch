@@ -8,7 +8,7 @@ Dernière mise à jour : 2026-10-23.
 ## État actuel
 
 - 48 modules, tous comparés aux messages de référence de la RFC 4475 (annexe A).
-- Sur le défaut testé : 42 conformes, 6 partiels, 0 non conforme. 2 cas de la RFC n'ont pas de module.
+- Sur le défaut testé : 43 conformes, 4 partiels, 1 non conforme (lwsstart, aléatoire). 2 cas de la RFC n'ont pas de module.
 - **Aucune vérification contre un vrai serveur SIP.** Tout a été validé hors réseau : génération des messages et comparaison à la référence.
 - **L'outil n'est pas utilisable sur une plateforme de production** : il laisse des appels fantômes (voir P1).
 
@@ -52,13 +52,13 @@ Dernière mise à jour : 2026-10-23.
 
 ### P3 — Fidélité RFC 4475
 
-- [ ] Tests partiels :
-  - esc02/escinv : un seul vrai Contact au lieu de deux ;
-  - mcl01/multicl : ni corps ni `Content-Type: text/plain` ;
-  - bigcode : code tiré au hasard sur 32 bits, au lieu de 2³²+5 (débordement) ;
-  - unksm2 : schemes aléatoires non enregistrés ;
-  - lwsstart : non déterministe (SP ou espace Unicode selon le tirage) ;
-  - noreason : le 100 porte un corps SDP.
+- [ ] **Non conforme — lwsstart** : `lwsInsert(endsonly=True)` tire au hasard parmi TAB, EN QUAD, EM QUAD, SP et U+3000. Une seule fois sur 5 on obtient le double SP de la RFC ; sinon on teste un caractère interdit dans la Request-Line, ce qui est un autre défaut.
+- [ ] Tests partiels (revus le 2026-10-23) :
+  - mcl01/multicl : CL 0 puis CL aléatoire sur 6 bits, corps vide. La première valeur correspond au corps, donc un parser laxiste n'est jamais piégé ; et si le tirage donne 0 (1/64), il n'y a plus de conflit. La RFC donne 13 et 5 pour un corps de 63 octets.
+  - bigcode : `getrandbits(32)` reste ≤ 2³²−1, donc le débordement de la RFC (2³²+5, qui retombe sur 5) n'est jamais testé.
+  - esc02/escinv : un seul vrai Contact au lieu de deux, et pas de `%` non-échappement dans le branch du Via.
+  - unksm2 : To avec un scheme aléatoire non enregistré au lieu de `isbn:`. Comportement attendu inchangé (400).
+- [ ] Écart mineur, conforme sur le défaut — noreason : le 100 porte le SDP hérité de l'INVITE de base.
 - [ ] Tests absents : wsinv (§3.1.1.1), dont la config `EXT_HEADERS` est prévue mais inutilisée, et intmeth (§3.1.1.2).
 - [ ] Libellés `module_info['test']` erronés :
   - `noreason` est intitulé « Content Length Larger Than Message » au lieu de « Empty Reason Phrase » ;
