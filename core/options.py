@@ -104,6 +104,10 @@ if args.lport:
 if args.rport:
     config.RPORT = args.rport
 
+# Needed before the target validation, which probes the target
+if args.timeout:
+    config.TIMEOUT = args.timeout
+
 if not (args.version and args.build_cache):
     if args.target:
         config.RHOST = args.target
@@ -119,9 +123,6 @@ if not (args.version and args.build_cache):
 
 if args.delay:
     config.DELAY = args.delay
-
-if args.timeout:
-    config.TIMEOUT = args.timeout
 
 if args.output:
     if os.path.isdir(args.output):

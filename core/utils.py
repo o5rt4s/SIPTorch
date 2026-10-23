@@ -86,12 +86,12 @@ def sipOptionsProbe(ip: str):
     sock.settimeout(config.TIMEOUT)
     try:
         # Connecting a UDP socket sends nothing but fixes the peer (so
-        # recv() only accepts the target's reply) and reveals the local
-        # source address for the Via. The source port stays ephemeral,
-        # so rport makes the server answer where we actually listen,
-        # and we avoid clashing with the tests binding on LPORT.
+        # recv() only accepts the target's reply) and gives the local
+        # address and ephemeral port, both advertised in the Via so the
+        # reply comes back with or without rport support. Not binding
+        # on LPORT avoids clashing with the tests.
         sock.connect((ip, config.RPORT))
-        src = sock.getsockname()[0]
+        src, sport = sock.getsockname()[:2]
         branch = random.getrandbits(32)
         callid = random.getrandbits(80)
         tag = random.getrandbits(32)
@@ -104,7 +104,7 @@ def sipOptionsProbe(ip: str):
             'Call-ID: %s\r\n'
             'CSeq: 1 OPTIONS\r\n'
             'Content-Length: 0\r\n\r\n'
-        ) % (ip, src, config.LPORT, branch, ip, tag, ip, callid)
+        ) % (ip, src, sport, branch, ip, tag, ip, callid)
         sock.send(req.encode('utf-8'))
         data = sock.recv(8192)
     except socket.timeout:
