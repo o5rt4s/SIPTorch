@@ -58,6 +58,7 @@ Les scripts de vérification et les messages de référence extraits ne sont pas
 ### P2 — Robustesse
 
 - [x] Dictionnaire d'en-têtes partagé — corrigé (`da23827`).
+- [x] Partie utilisateur non-`\w` — corrigé. escvalid plantait (`.group(1)` sur `None`) et escnull/escinv rataient leur substitution en silence dès que l'extension contenait un caractère hors `\w` (ex. une extension E.164 `+33612345678` via `-e`). Les regex ciblent désormais la userpart réelle (`sip:[^@\s]+@`) et le display name quoté (`"[^"]*"`).
 - [ ] `connector.sendreq` découpe une `str` avec un nombre d'octets : corruption au-delà de 8192 octets en UTF-8.
 - [ ] `utils.extractExtension` : `re.compile(motif, addr, re.I)` plante toujours, donc l'option `-F/--from-addr` est inutilisable.
 - [ ] `parser.parseSIPMessage` : `split('\r\n\r\n')` sans maxsplit, d'où une `ValueError` si le corps contient une ligne vide.

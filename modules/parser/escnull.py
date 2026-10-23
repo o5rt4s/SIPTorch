@@ -39,10 +39,9 @@ def escnull():
     msg = buildreq.makeRequest('REGISTER')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: modify to and from headers
-    head['To'] = re.sub(r'sip:\w+?@', 
-        'sip:null-%s-null@' % NULL_CHAR, head.get('To'))
-    head['From'] = re.sub(r'sip:\w+?@', 
-        'sip:null-%s-null@' % NULL_CHAR, head.get('From'))
+    repl = lambda _: 'sip:null-%s-null@' % NULL_CHAR
+    head['To'] = re.sub(r'sip:[^@\s]+?@', repl, head.get('To'))
+    head['From'] = re.sub(r'sip:[^@\s]+?@', repl, head.get('From'))
     # Tweak 2: deux Contact distincts, %00 et %00%00, sur l'host reel
     host = re.search(r'@([\w\.:]+)', head.get('Contact')).group(1)
     head['Contact'] = '<sip:%s@%s>' % (NULL_CHAR, host)

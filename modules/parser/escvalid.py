@@ -45,11 +45,13 @@ def escvalid():
     log.info('Testing module: %s' % module_info['test'])
     msg = buildreq.makeRequest('INVITE')
     mline, head, body = parseSIPMessage(msg)
-    # Tweak 1: Modify the user part
-    user = re.search(r'(sip:\w+?@[\w\.]+?)\s', mline, re.I).group(1)
-    user = urlEncodeStrValid(user)
-    # Now replace the grep inside the method
-    mline = re.sub(r'sip:\w+@', 'sip:%s@' % user, mline)
+    # Tweak 1: Modify the user part. The userpart may hold any SIP user
+    # character (e.g. a leading '+' for E.164), not only \w.
+    m = re.search(r'(sip:[^@\s]+@[^\s;>]+)', mline, re.I)
+    if m:
+        user = urlEncodeStrValid(m.group(1))
+        # replacement passed as a function so % and \ in user are literal
+        mline = re.sub(r'sip:[^@\s]+@', lambda _: 'sip:%s@' % user, mline, count=1)
     # Tweak 2: Modify the to and from headers
     head['To'] = 'sip:%s@%s' % (
         urlEncodeStrInvalid('user', value=2), config.RHOST)
