@@ -38,8 +38,9 @@ def insuf():
     rmhead = ('Call-ID', 'From', 'To')
     for x in rmhead:
         head.pop(x, None)
-    # Tweak 2: Adding a random header
-    head['Content-Length'] = '152'
+    # Tweak 2: Content-Length coherent avec le corps (le defaut teste
+    # est l'absence de Call-ID/From/To, pas un Content-Length errone)
+    head['Content-Length'] = len(body.encode('utf-8'))
     # Forming the request message back up
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

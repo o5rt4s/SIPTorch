@@ -9,7 +9,7 @@
 # This module requires SIPTorch
 # https://github.com/0xInfection/SIPTorch
 
-import logging
+import logging, re
 from core.plugrun import runPlugin
 from core.requester import buildreq
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
@@ -34,9 +34,10 @@ def lwsdp():
     log.info('Testing module: %s' % module_info['test'])
     msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
-    # Tweak 1: Remove LWS between from and to
-    head['From'] = head.get('From').replace(' ', '')
-    head['To'] = head.get('To').replace(' ', '')
+    # Tweak 1: display name en token (sans guillemets) colle au < du
+    # name-addr. C'est l'absence de LWS token/< qui est testee ici.
+    head['From'] = re.sub(r'"[^"]*"\s*<', 'caller<', head.get('From'))
+    head['To'] = re.sub(r'"[^"]*"\s*<', 'callee<', head.get('To'))
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

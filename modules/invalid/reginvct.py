@@ -35,11 +35,12 @@ def reginvct():
     '''
     log = logging.getLogger('reginvct')
     log.info('Testing module: %s' % module_info['test'])
-    msg = buildreq.makeRequest('OPTIONS')
+    msg = buildreq.makeRequest('REGISTER')
     mline, head, body = parseSIPMessage(msg)
-    # Tweak 1: Modify the contact header, and leave it just 
-    # like that, not adding any < or > around URL
-    head['Contact'] += r'?Route=%3Csip:sip.example.com%3E'
+    # Tweak 1: header echappe dans l'URI sans <>, ce qui rend le
+    # Contact malforme (le name-addr serait obligatoire ici)
+    head['Contact'] = head.get('Contact').strip('<>') + \
+        r'?Route=%3Csip:sip.example.com%3E'
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg
 

@@ -69,7 +69,7 @@ def mpmime():
     body += 'sfer-Encoding: binary\r\n\r\n%s\r\n--%s--' % (
         bytearray.fromhex(cer).decode('utf-8', errors='ignore'), boundary)
     # Tweak 6: Add content-length header
-    head['Content-Length'] = len(body)
+    head['Content-Length'] = len(body.encode('utf-8'))
     # Forming the message up back again
     mg = concatMethodxHeaders(mline, head, body=body)
     return mg

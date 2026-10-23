@@ -36,7 +36,7 @@ def badbranch():
     '''
     log = logging.getLogger('badbranch')
     log.info('Testing module: %s' % module_info['test'])
-    msg = buildreq.makeRequest('INVITE')
+    msg = buildreq.makeRequest('OPTIONS')
     mline, head, body = parseSIPMessage(msg)
     # Tweak 1: Remove the branch identifier after z9hG4bk
     repl = re.sub(r'z9hG4bK.*?[^;]*', r'z9hG4bK', head['Via'])

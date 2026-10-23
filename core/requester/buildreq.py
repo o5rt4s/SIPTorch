@@ -66,7 +66,7 @@ def makeRequest(method, bsbody=''):
     if not STATIC_CID:
         headers["Call-ID"] = random.getrandbits(80)
     headers['CSeq'] = '%s %s' % (CSEQ, method)
-    headers['Content-Length'] = len(body)
+    headers['Content-Length'] = len(body.encode('utf-8'))
     if 'register' not in method.lower():
         headers['Contact'] = '<sip:%s@%s:%s>' % (senderext, srchost, LPORT)
     if body and contenttype:
