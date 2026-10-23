@@ -12,7 +12,6 @@
 import logging
 from libs import config
 from core.plugrun import runPlugin
-from core.uaselect import randUASelect
 from core.utils import getSourceHost
 
 module_info = {
@@ -33,22 +32,22 @@ def wsinv():
     and name case, and integer fields with leading zeros.
 
     All elements must treat this as a well formed request. The message is
-    reproduced verbatim from RFC 4475 (message wsinv); only the target
-    host and the local sent-by are adapted so it reaches the target.
+    reproduced verbatim from RFC 4475 (message wsinv); only the sent-by
+    of the first Via is adapted so a reply can come back. The datagram is
+    sent to the target's IP/port at the transport layer, so the example
+    hosts in the Request-URI and elsewhere do not need rewriting.
     '''
     log = logging.getLogger('wsinv')
     log.info('Testing module: %s' % module_info['test'])
-    dst = config.RHOST
     sby = '%s:%s' % (getSourceHost(), config.LPORT)
-    ua = randUASelect() if config.SPOOF_UA else config.USER_AGENT
     # The exact byte structure is the point of the test, so the message
     # is emitted literally with CRLF folding rather than rebuilt from a
     # header dict (which would lose folding, ordering and LWS).
     msg = (
-        'INVITE sip:vivekg@%s;unknownparam SIP/2.0\r\n'
+        'INVITE sip:vivekg@chair-dnrc.example.com;unknownparam SIP/2.0\r\n'
         'TO :\r\n'
-        ' sip:vivekg@%s ;   tag    = 1918181833n\r\n'
-        'from   : "J Rosenberg \\\\\\""       <sip:jdrosen@%s>\r\n'
+        ' sip:vivekg@chair-dnrc.example.com ;   tag    = 1918181833n\r\n'
+        'from   : "J Rosenberg \\\\\\""       <sip:jdrosen@example.com>\r\n'
         '  ;\r\n'
         '  tag = 98asjd8\r\n'
         'MaX-fOrWaRdS: 0068\r\n'
@@ -58,7 +57,7 @@ def wsinv():
         '  INVITE\r\n'
         'Via  : SIP  /   2.0\r\n'
         ' /UDP\r\n'
-        '    %s;branch=390skdjuw\r\n'
+        '    SENTBY;branch=390skdjuw\r\n'
         's :\r\n'
         'NewFangledHeader:   newfangled value\r\n'
         ' continued newfangled value\r\n'
@@ -70,19 +69,19 @@ def wsinv():
         '  branch  =   z9hG4bK9ikj8  ,\r\n'
         ' SIP  /    2.0   / UDP  192.168.255.111   ; branch=\r\n'
         ' z9hG4bK30239\r\n'
-        'm:"Quoted string \\"\\"" <sip:jdrosen@%s> ; newparam =\r\n'
+        'm:"Quoted string \\"\\"" <sip:jdrosen@example.com> ; newparam =\r\n'
         '      newvalue ;\r\n'
         '  secondparam ; q = 0.33\r\n'
         '\r\n'
         'v=0\r\n'
-        'o=mhandley 29739 7272939 IN IP4 %s\r\n'
+        'o=mhandley 29739 7272939 IN IP4 192.0.2.3\r\n'
         's=-\r\n'
-        'c=IN IP4 %s\r\n'
+        'c=IN IP4 192.0.2.4\r\n'
         't=0 0\r\n'
         'm=audio 49217 RTP/AVP 0 12\r\n'
         'm=video 3227 RTP/AVP 31\r\n'
-        'a=rtpmap:31 LPC'
-    ) % (dst, dst, dst, sby, dst, getSourceHost(), getSourceHost())
+        'a=rtpmap:31 LPC\r\n'
+    ).replace('SENTBY', sby)
     return msg
 
 def run():
