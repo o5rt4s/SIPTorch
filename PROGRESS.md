@@ -1,85 +1,89 @@
 # PROGRESS — Audit et corrections SIPTorch
 
 Suivi de l'audit de SIPTorch (suite de tests de torture SIP, RFC 4475) et des corrections apportées.
-Branche d'intégration : `develop`. `master` n'a pas été modifiée.
 
-Branches :
+Dernière mise à jour : 2026-10-23 (audit complet refait sur `c55cc1f`).
+
+## Branches
+
 - `master` : code d'origine (`cb956ba`), inchangé.
-- `develop` : `master` + l'ensemble des corrections, fusionnées par le commit de merge `6208ee5`.
+- `develop` : branche d'intégration, contient toutes les corrections.
 - `claude/amazing-fermat-qsvn2o` : ancienne branche de travail, entièrement contenue dans `develop`. **À supprimer à la main sur GitHub** : la suppression est refusée (403) par la politique réseau de la session Claude.
-
-Dernière mise à jour : 2026-10-23.
 
 ## État actuel
 
-- 50 modules (wsinv et intmeth ajoutés), tous comparés aux messages de référence de la RFC 4475 (annexe A).
-- Sur le défaut testé : **50 conformes, 0 partiel, 0 non conforme**. Les 49 cas de la RFC 4475 §3 sont tous couverts (wsinv et intmeth inclus ; le 50ᵉ module, intwdcl, est la variante « Content-Length non numérique » de ncl).
-- **Aucune vérification contre un vrai serveur SIP.** Tout a été validé hors réseau : génération des messages et comparaison à la référence.
-- **L'outil n'est pas utilisable sur une plateforme de production** : il laisse des appels fantômes (voir P1).
+- **Messages : conformes.** 50 modules couvrent les 49 messages de la RFC 4475 §3 (intwdcl est la variante « Content-Length non numérique » de ncl, citée au §3.1.2.3). Chaque message reproduit le défaut de son message de référence de l'annexe A ; wsinv et intmeth sont identiques octet pour octet à la référence (seul le sent-by du Via est adapté).
+- **Résultats : pas encore fiables.** L'outil ne rend pas de verdict et peut attribuer une réponse au mauvais test (voir P1).
+- **Exploitation : à proscrire sur une plateforme de production.** 18 modules envoient un INVITE sans jamais l'annuler ni le terminer.
+- Rien n'a été testé contre un vrai serveur SIP : toutes les vérifications ont été faites hors réseau.
 
-## Fait
+## Historique des corrections
 
 | Commit | Contenu |
 |---|---|
-| `1c8cfb5` | **Contact** : adresse de l'outil au lieu de celle de la cible.<br>**Content-Type** : `application/sdp` quand l'INVITE porte du SDP ; en-tête retiré si le corps est vide.<br>**SDP** : `o=` et `c=` sur l'IP de l'outil.<br>**Via** : IP source réelle, plus `127.0.0.1` (`getSourceHost()`).<br>**Bind** : `0.0.0.0:LPORT` effectué avant l'envoi (`'any'` était invalide).<br>**Échappement** : `urlEncodeStrValid` réparé (cassait esc01). |
-| `36258b9` | Alignement des 10 tests non conformes sur leur référence RFC : cparam1, cparam2, escnull, lwsdp, novelscm, badbranch, reginvct, invsdp, insuf, mpmime.<br>`Content-Length` compté en octets UTF-8 et non plus en caractères. |
-| `fcb09e6` | `reginvct` construit son propre Contact. Corrige une régression introduite par `36258b9` : plantage quand le module est lancé seul. |
-| `54fc279` | Les 6 tests partiels ou non conformes restants alignés sur la RFC (lwsstart, multicl, bigcode, escinv, unksm2, noreason) ; Record-Route ajouté à inv2543. |
-| `da23827` | **Point 2** : `DEF_HSET` copié à chaque requête, plus aucun état partagé entre tests. Les REGISTER reçoivent leur propre Contact (`<sip:<extension>@<IP source>:<LPORT>>`). |
-
+| `1c8cfb5` | Contact sur l'adresse de l'outil ; `Content-Type: application/sdp` sur les INVITE avec SDP ; `o=`/`c=` du SDP sur l'IP de l'outil ; Via avec l'IP source réelle (`getSourceHost()`) ; bind sur `0.0.0.0:LPORT` avant l'envoi ; `urlEncodeStrValid` réparé. |
+| `36258b9` | 10 tests alignés sur leur message de référence (cparam1, cparam2, escnull, lwsdp, novelscm, badbranch, reginvct, invsdp, insuf, mpmime) ; `Content-Length` compté en octets UTF-8. |
+| `fcb09e6` | reginvct construit son propre Contact (régression de `36258b9` corrigée). |
+| `54fc279` | 6 tests partiels alignés (lwsstart, multicl, bigcode, escinv, unksm2, noreason) ; Record-Route ajouté à inv2543. |
+| `da23827` | Dictionnaire d'en-têtes copié à chaque requête (plus d'état partagé entre tests) ; Contact propre aux REGISTER. |
 | `6208ee5` | Merge de la branche de travail dans `develop`. |
-| (ce commit) | Ajout de wsinv (§3.1.1.1) et intmeth (§3.1.1.2), émis littéralement (pliage, LWS, ordre, octets non-ASCII) ; intmeth bit-exact à l'hôte près. Libellés `module_info['test']` de noreason et trws corrigés. `modules.json` régénéré (50 tests). |
+| `968a498` | Modules wsinv (§3.1.1.1) et intmeth (§3.1.1.2) ajoutés ; libellés de noreason et trws corrigés ; `modules.json` régénéré (50 tests). |
+| `e9a0268` | wsinv rendu identique octet pour octet à la référence. |
+| `c55cc1f` | Paragraphe RFC et message de référence ajoutés dans `module_info` (`rfc`, `ref`) et dans le rapport Markdown. |
 
-### Vérifications effectuées
+## Vérifications effectuées
 
-Méthode commune : messages générés hors réseau avec une graine aléatoire fixe, dans l'ordre réel de `runAll`, puis comparés avant/après chaque commit et aux messages de référence de l'annexe A.
+Méthode : messages générés hors réseau avec une graine aléatoire fixe, dans l'ordre réel d'exécution, comparés avant/après chaque commit et aux messages de référence de l'annexe A (extraits de l'archive base64 de la RFC).
 
-- `36258b9` et `fcb09e6` : seuls les 10 modules visés changent, les 38 autres sont identiques octet pour octet (hors en-tête `Date`). La régression de `reginvct` (plantage en exécution isolée) a été détectée puis corrigée par `fcb09e6`.
-- `54fc279` : seuls les 7 modules visés changent. Le défaut RFC de chacun est vérifié par assertion explicite sur 200 graines différentes : 200/200 pour les 7.
-- `da23827` : seule la partie utilisateur du Contact de 6 REGISTER change. Comparaison à l'annexe A identique ligne pour ligne. Les 48 modules lancés seuls ne plantent plus et produisent le même message qu'en exécution complète, ce qui prouve qu'aucun état ne fuit plus.
-- Les scripts de vérification et les messages de référence extraits ne sont **pas** dans le dépôt : ils étaient dans le répertoire temporaire de la session. Pour les reproduire, extraire l'archive base64 (tar.gz) de l'annexe A de la RFC, générer les messages en remplaçant `pluginbase` par un module vide, puis comparer ligne de départ et en-têtes ciblés.
+- Chaque commit de correction : seuls les modules visés changent, tous les autres restent identiques octet pour octet (hors en-tête `Date`).
+- `54fc279` : défaut RFC vérifié par assertion explicite sur 200 graines aléatoires pour les 7 modules modifiés (200/200).
+- `da23827` : les 50 modules lancés seuls produisent le même message qu'en exécution complète et ne plantent plus.
+- wsinv et intmeth : comparaison octet par octet avec la référence, et les caractéristiques listées dans la RFC contrôlées une à une (14 pour wsinv, 10 pour intmeth). Pour intmeth, les octets transmis à `sendto()` ont aussi été vérifiés avec un faux socket.
+- `c55cc1f` : rapport complet produit avec un faux transport ; 50 entrées portent leur paragraphe RFC.
+- Audit du 2026-10-23 : 50 messages, 0 plantage, identiques à l'état vérifié ; analyse statique (pyflakes) sans nom réellement indéfini.
+
+Les scripts de vérification et les messages de référence extraits ne sont pas dans le dépôt (répertoire temporaire de session). Pour les refaire : extraire l'archive de l'annexe A, générer les messages en remplaçant `pluginbase` par un module vide, comparer ligne de départ et en-têtes ciblés.
 
 ## Reste à faire
 
 ### P1 — Résultats faussés ou risque d'exploitation
 
-- [ ] **Appels fantômes.** Aucun CANCEL sur 1xx, ni ACK sur réponse finale, ni BYE sur 2xx. Le socket est fermé après la 1ʳᵉ ou la 2ᵉ réponse, ce qui laisse sonneries et transactions pendantes. Envoient un INVITE : insuf, invct, invsdp, multireq, inv2543, baddate, balquote, clerr, escuri, exthdsep, intwdcl, ltgtrequri, lwsstart, lwsuri, negcl, escvalid, longreq.
-- [ ] **Aucun verdict.** La première réponse reçue est loggée sans être comparée au comportement attendu par la RFC. `rfc` et `ref` sont désormais dans `module_info` et dans le rapport ; reste à ajouter `expect` (par rôle : proxy, UAS, registrar) et à évaluer réussi/échoué.
-- [ ] **Réponses envoyées comme si c'étaient des requêtes** (bcast, bigcode, respsclarg, noreason, unreason). Un UAS les jette sans répondre, ce qui donne un timeout présenté comme un incident serveur. L'absence de réponse doit être le résultat attendu, et ces tests n'ont de sens que contre un proxy.
-- [ ] **`checkBadResponse`** : `BAD_RESP = ['100','182','486','600']` traite des réponses finales (486, 600) comme des provisoires, alors que 180 et 183 sont absents. Une seule réponse supplémentaire est attendue.
-- [ ] **Validation de la cible en TCP** (`utils.lookUp`) alors que l'outil parle UDP : faux négatif sur un serveur UDP seul.
+- [ ] **Réponses attribuées au mauvais test** *(nouveau)*. `connector.handler` renvoie le premier datagramme reçu sur `LPORT`, sans vérifier Call-ID, CSeq ni branch. Comme l'outil n'envoie jamais d'ACK, le serveur retransmet ses réponses finales aux INVITE (Timer G, pendant jusqu'à 32 s). Ces retransmissions arrivent pendant les tests suivants, qui réutilisent le même port, et sont enregistrées comme leur réponse.
+- [ ] **Appels fantômes.** Aucun CANCEL sur 1xx, ni ACK sur réponse finale, ni BYE sur 2xx. 18 modules envoient un INVITE : baddate, balquote, clerr, escuri, escvalid, exthdsep, insuf, intwdcl, inv2543, invct, invsdp, longreq, ltgtrequri, lwsstart, lwsuri, multireq, negcl, wsinv.
+- [ ] **Aucun verdict.** La réponse est loggée sans être comparée au comportement attendu. `rfc` et `ref` sont dans `module_info` ; reste à ajouter `expect` (par rôle : proxy, UAS, registrar) et à évaluer réussi/échoué.
+- [ ] **Réponses envoyées comme si c'étaient des requêtes** (bcast, bigcode, noreason, respsclarg, unreason). Un UAS les jette sans répondre : le timeout est alors présenté comme un incident serveur, alors que c'est le résultat attendu.
+- [ ] **`checkBadResponse`** : `BAD_RESP = ['100','182','486','600']` traite des réponses finales (486, 600) comme provisoires, sans 180 ni 183, et n'attend qu'une seule réponse de plus.
+- [ ] **Pas de retransmission des requêtes en UDP** *(nouveau)* (Timers A/E de RFC 3261) : un seul datagramme perdu donne un timeout présenté comme un incident serveur.
+- [ ] **Validation de la cible** (`utils.lookUp`) : en TCP alors que l'outil parle UDP (faux négatif sur un serveur UDP seul). *Nouveau* : le port testé est figé à 5060 par la valeur par défaut de l'argument, évaluée à l'import ; l'option `-p` est donc ignorée, alors que le message d'erreur affiche le port demandé.
 
 ### P2 — Robustesse
 
-- [x] **Dictionnaire d'en-têtes partagé** : corrigé, copie de `DEF_HSET` à chaque requête et Contact propre aux REGISTER. Seul effet sur les messages : la partie utilisateur du Contact de 6 REGISTER (cparam1, cparam2, dblreq, regeschd, reqsclarg, unkauth) devient l'extension au lieu d'un utilisateur hérité du test précédent.
+- [x] Dictionnaire d'en-têtes partagé — corrigé (`da23827`).
 - [ ] `connector.sendreq` découpe une `str` avec un nombre d'octets : corruption au-delà de 8192 octets en UTF-8.
 - [ ] `utils.extractExtension` : `re.compile(motif, addr, re.I)` plante toujours, donc l'option `-F/--from-addr` est inutilisable.
 - [ ] `parser.parseSIPMessage` : `split('\r\n\r\n')` sans maxsplit, d'où une `ValueError` si le corps contient une ligne vide.
-- [ ] `from libs.config import *` dans `buildreq` : les globales sont capturées par valeur à l'import.
+- [ ] `from libs.config import *` dans `buildreq` : valeurs capturées à l'import.
 - [ ] `connector.handler` : après le timeout de `select`, un `recvfrom` bloquant attend un second `TIMEOUT`, ce qui double le délai.
-- [ ] `options.py` : condition `not (version and build_cache)` qui devrait être `or`, parsing argparse exécuté à l'import, fonctions mortes (`fileWriter`, `readHeader`).
+- [ ] `options.py` : condition `not (version and build_cache)` qui devrait être `or` ; parsing exécuté à l'import. *Nouveau* : les messages de log émis pendant ce parsing, avant que `startEngine` installe le handler, sont perdus.
+- [ ] Code mort *(nouveau)* : 7 mutateurs jamais utilisés (addrheader, convshort, insertbklash, lwsinsert, nullinsert, permcase, randuplow) ; `fileWriter`, `readHeader` ; config `CONTACT`, `IP6_SUPPORT`, `EXT_HEADERS` (seulement lu par addrheader) ; 21 imports inutilisés.
+- [ ] Rapport Markdown *(nouveau)* : les messages sont écrits bruts, octets de contrôle compris (NUL de intmeth et mpmime), ce qui gêne certains visualiseurs.
 - [ ] `requirements.txt` : `pluginbase` non épinglé, et son build échoue sous Python 3.13 dans l'environnement de test.
-- [ ] `libs/data.py` : séquence d'échappement invalide `'\ '` dans l'ASCII art (`SyntaxWarning` sous Python ≥ 3.12).
+- [ ] `libs/data.py` : séquence d'échappement `'\ '` invalide dans l'ASCII art (`SyntaxWarning`, et erreur avec `-W error`).
 - [ ] UDP uniquement : longreq et mpmime dépassent 1300 octets (RFC 3261 §18.1.1), et TCP n'est pas implémenté.
+- [ ] Options mineures *(nouveau)* : `-t` n'accepte que des entiers ; `-e 0` est ignoré (test `if args.exten`).
+- [ ] CI *(nouveau)* : `.travis.yml` cible Python 3.7 sur travis-ci.org (service arrêté) et lance un vrai scan contre une IP tierce (`172.104.142.43`). Envoyer des messages de torture à un hôte qu'on ne maîtrise pas est à retirer.
 
-### P3 — Fidélité RFC 4475
+### P3 — Fidélité RFC 4475 et documentation
 
-- [x] Tests partiels/non conformes rendus conformes (2026-10-23) :
-  - lwsstart : exactement deux SP entre les éléments de la Request-Line (plus de tirage TAB/Unicode).
-  - multicl : corps texte encadré par deux Content-Length en conflit (13 et 5) + `Content-Type: text/plain`.
-  - bigcode : code `2**32 + 5`, qui retombe sur 5 en entier 32 bits (le débordement visé).
-  - escinv : deux vrais Contact encadrant un nom d'en-tête échappé, + `%` non-échappement dans le branch du Via.
-  - unksm2 : To avec le scheme enregistré `isbn:`.
-  - noreason : réponse 100 sans corps.
-  - inv2543 : ajout du `Record-Route` présent dans le message de référence.
-- [ ] Reste des valeurs tirées au hasard, de même nature que la RFC (non bloquant) : méthode et header échappés de escinv, méthode inconnue de metmatch, noms d'en-tête longs de longreq. intwdcl utilise la variante « Content-Length non numérique » explicitement citée par la RFC §3.1.2.3.
-- [ ] mpmime : la partie binaire n'est pas bit-exacte (265 octets contre 342 dans la référence). Le module décode le blob en UTF-8 avec `errors='ignore'`, ce qui supprime des octets. Le défaut testé reste présent (octets 0x00 dans la partie binaire, Content-Length exact). Pour le corriger, il faut faire transiter le message en octets bruts dans `buildreq`, `concatMethodxHeaders` et `connector`.
-- [x] Tests absents ajoutés : wsinv (§3.1.1.1) et intmeth (§3.1.1.2). Émis littéralement car le pliage de lignes, la LWS entre `:`, l'ordre et les octets non-ASCII ne peuvent pas être reconstruits via le dict de `concatMethodxHeaders`. intmeth est bit-exact à la référence (hôte substitué) ; wsinv l'est à l'hôte et au CRLF final près. La config `EXT_HEADERS`/`IDENTITY` reste inutilisée (le contenu de wsinv est embarqué dans le module).
-- [x] Libellés `module_info['test']` corrigés : noreason → « Empty Reason Phrase », trws → « SP Characters at End of Request-Line ».
+- [x] Les 50 modules reproduisent le défaut de leur message de référence ; wsinv et intmeth ajoutés ; libellés corrigés ; paragraphe RFC dans le rapport.
+- [ ] mpmime : partie binaire non identique à la référence (265 octets contre 342), car le blob est décodé en UTF-8 avec `errors='ignore'`. Le défaut testé reste présent (octets 0x00, Content-Length exact). Correction : faire transiter le message en octets bruts dans `buildreq`, `concatMethodxHeaders` et `connector`.
+- [ ] Valeurs tirées au hasard mais de même nature que dans la RFC (non bloquant) : méthode et en-tête échappés d'escinv, méthode inconnue de metmatch, noms longs de longreq.
+- [ ] README obsolète *(nouveau)* : annonce 48 modules et ne liste ni wsinv ni intmeth.
+- Décision prise : le Via d'intmeth reste en `SIP/2.0/TCP`, comme dans la référence, bien que l'outil envoie en UDP. Un serveur strict répondra en TCP et l'outil verra un timeout.
 
 ## Correspondance modules ↔ RFC 4475
 
-Cette correspondance est aussi portée par chaque module (`module_info['rfc']` et `module_info['ref']`) et apparaît dans le rapport Markdown, sous la forme `- RFC 4475: §3.1.1.3 (message `esc01`)`.
+Portée aussi par chaque module (`module_info['rfc']`, `module_info['ref']`) et affichée dans le rapport, sous la forme `- RFC 4475: §3.1.1.3 (message `esc01`)`.
 
 | § | Réf. | Module | | § | Réf. | Module |
 |---|---|---|---|---|---|---|
@@ -112,4 +116,4 @@ Cette correspondance est aussi portée par chaque module (`module_info['rfc']` e
 
 ## Correction d'un constat antérieur
 
-L'audit initial signalait `Route: <sip:127.0.0.1:5080>` dans mpmime comme absent de la RFC. C'est faux : cet en-tête figure dans le message de référence mpart01. Ce n'est pas un écart à la RFC. L'effet reste à garder en tête en exploitation : un proxy qui applique le loose routing contactera son propre loopback.
+L'audit initial signalait `Route: <sip:127.0.0.1:5080>` dans mpmime comme absent de la RFC. C'est faux : cet en-tête figure dans le message de référence mpart01. L'effet reste à connaître en exploitation : un proxy qui applique le loose routing contactera son propre loopback.
