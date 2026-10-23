@@ -79,12 +79,13 @@ IDENTITY += r'q3pjT1hoRwakEGjHCnWSwUnshd0-zJ6F1VOgFWSjHBr8Qjpjlk-cpFYpFYs'
 IDENTITY += r'ojNCpTzO3QfPOlckGaS6hEck7w;info=<https://0xInfection.xyz/random.cert>'
 
 # Invite body to use
-# maintain the x.x.x.x and y.y.y.y because they will be replaced dynamically
-# for some tests, x.x.x.x => IPv4 for caller, y.y.y.y => IPv4 of callee
+# maintain the x.x.x.x because it will be replaced dynamically by the
+# IPv4 of the caller (siptorch): it is both the SDP origin and the
+# address where the offerer expects to receive media
 INVITE_BODY =  'v=0\r\n'
 INVITE_BODY += 'o=mhandley 29739 7272939 IN IP4 x.x.x.x\r\n'
 INVITE_BODY += 's=-\r\n'
-INVITE_BODY += 'c=IN IP4 y.y.y.y\r\n'
+INVITE_BODY += 'c=IN IP4 x.x.x.x\r\n'
 INVITE_BODY += 't=0 0\r\n'
 INVITE_BODY += 'm=audio 49217 RTP/AVP 0 12\r\n'
 INVITE_BODY += 'm=video 3227 RTP/AVP 31\r\n'
@@ -116,7 +117,7 @@ TIMEOUT = 5
 DELAY = 0
 
 # Binding interface to use
-BIND_IFACE = 'any'
+BIND_IFACE = '0.0.0.0'
 
 # Log to file bool
 LOG_FILE = True

@@ -29,10 +29,10 @@ def runPlugin(msg: str, minfo: dict):
     if not msg:
         log.critical('Nothing received as request body')
         return
-    sock = connector.sockinit()
     print(GR, 'Running test: %s%s%s' % (color.ORANGE, minfo['test'], color.END))
     log.debug("Sending the request")
     try:
+        sock = connector.sockinit()
         log.debug('\n%sRequest:%s %s' % (color.RED, color.END, msg.strip()))
         connector.sendreq(sock, msg)
         data, *_ = connector.handler(sock)

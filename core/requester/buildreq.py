@@ -9,10 +9,11 @@
 # This module requires SIPTorch
 # https://github.com/0xInfection/SIPTorch
 
-import random, socket, re
+import random, re
+from libs import config
 from libs.config import *
 from core.uaselect import randUASelect
-from core.utils import extractExtension
+from core.utils import extractExtension, getSourceHost
 from core.requester.parser import concatMethodxHeaders
 from mutators.replparam import genRandStr
 
@@ -25,13 +26,15 @@ def makeRequest(method, bsbody=''):
     branch = BRANCH
     body = ''
     contenttype = None
-    srchost = socket.gethostbyname(socket.gethostname()) if not SRC_HOST else SRC_HOST
+    srchost = getSourceHost()
     dsthost = IP  # if IP else validateHost(RHOST)
     if 'invite' in method.lower():
-        body = INVITE_BODY
-        body = body.replace('x.x.x.x', srchost).replace('y.y.y.y', dsthost)
+        body = INVITE_BODY.replace('x.x.x.x', srchost)
+        contenttype = 'application/sdp'
     if bsbody:
         body = bsbody
+        # A caller supplied body must be typed by the caller
+        contenttype = config.CONTENT_TYPE
     if extension is None or method.upper() == 'REGISTER':
         uri = 'sip:%s' % dsthost
     else:
@@ -41,7 +44,6 @@ def makeRequest(method, bsbody=''):
     else: headers['User-Agent'] = USER_AGENT
     if not BRANCH:
         branch = '%s' % random.getrandbits(32)
-    else: srchost = SRC_HOST
     headers['Via'] = 'SIP/2.0/UDP %s:%s;branch=z9hG4bK-%s;rport' % (srchost, LPORT, branch)
     headers['Max-Forwards'] = 70
     if not TO_ADDR:
@@ -66,11 +68,12 @@ def makeRequest(method, bsbody=''):
     headers['CSeq'] = '%s %s' % (CSEQ, method)
     headers['Content-Length'] = len(body)
     if 'register' not in method.lower():
-        headers['Contact'] = '<sip:%s@%s>' % (senderext, RHOST)
-    if CONTENT_TYPE is not None and len(body) > 0:
-        contenttype = CONTENT_TYPE
-    if contenttype is not None:
+        headers['Contact'] = '<sip:%s@%s:%s>' % (senderext, srchost, LPORT)
+    if body and contenttype:
         headers['Content-Type'] = contenttype
+    else:
+        # headers is shared across requests, drop any stale value
+        headers.pop('Content-Type', None)
     r = '%s %s SIP/2.0\r\n' % (method, uri)
     reformedmsg = concatMethodxHeaders(r, headers, body=body)
     return reformedmsg

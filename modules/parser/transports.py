@@ -10,9 +10,10 @@
 # https://github.com/0xInfection/SIPTorch
 
 from libs import config
-import logging, socket, random
+import logging, random
 from core.plugrun import runPlugin
 from core.requester import buildreq
+from core.utils import getSourceHost
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
 
 module_info = {
@@ -40,8 +41,7 @@ def transports():
     # allow duplicate dicts, so we permutate the letters toggling upper/
     # lowercase to form different headers, since headers are 
     # case-insensitive as mentioned in the RFC
-    srchost = socket.gethostbyname(
-        socket.gethostname()) if not config.SRC_HOST else config.SRC_HOST
+    srchost = getSourceHost()
     # Add udp as transport method in via header
     head['via'] = 'SIP/2.0/TCP %s:%s;branch=z9hG4bK-%s;rport' % \
         (srchost, config.LPORT, random.getrandbits(32))

@@ -13,6 +13,7 @@ import logging, re, random
 from libs import config
 from core.plugrun import runPlugin
 from core.requester import buildreq
+from core.utils import getSourceHost
 from mutators.urlencchar import urlEncodeStrValid
 from mutators.urlencchar import urlEncodeStrInvalid
 from core.requester.parser import parseSIPMessage, concatMethodxHeaders
@@ -54,9 +55,9 @@ def escvalid():
         urlEncodeStrValid('I have spaces in user name'), 
         config.RHOST, random.getrandbits(32))
     # Tweak 3: modify the contact header
-    head['Contact'] = '<sip:%s@%s;%s;%s=%s%s>' % (
+    head['Contact'] = '<sip:%s@%s:%s;%s;%s=%s%s>' % (
         urlEncodeStrInvalid('caller', value=1),
-        config.RHOST, urlEncodeStrInvalid('lr', value=2),
+        getSourceHost(), config.LPORT, urlEncodeStrInvalid('lr', value=2),
         urlEncodeStrInvalid('name', value=1),
         urlEncodeStrInvalid('value', value=2),
         r'%25%34%31'
