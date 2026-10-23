@@ -48,7 +48,7 @@ def makeRequest(method, bsbody=''):
     headers['Via'] = 'SIP/2.0/UDP %s:%s;branch=z9hG4bK-%s;rport' % (srchost, LPORT, branch)
     headers['Max-Forwards'] = 70
     if not TO_ADDR:
-        headers['To'] = '"%s" <sip:%s@%s>' % (DEF_EXT, DEF_EXT, RHOST)
+        headers['To'] = '"sut" <sip:%s@%s>' % (DEF_EXT, RHOST)
     else: headers['To'] = TO_ADDR
     if not FROM_ADDR:
         senderext = genRandStr(5)
